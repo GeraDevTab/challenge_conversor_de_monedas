@@ -2,6 +2,7 @@ package com.aluracursos.challengeconversormonedas.principal;
 
 import com.aluracursos.challengeconversormonedas.modelos.Monedas;
 import com.aluracursos.challengeconversormonedas.modelos.Monedas2;
+import com.aluracursos.challengeconversormonedas.modelos.ResultadoConversion;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -18,6 +19,8 @@ import java.util.Scanner;
 public class Principal {
     public static void main(String[] args) {
         var opcion = -1;
+        String monedaBase="USD";
+        String monedaObjetivo = "USD";
 
         Scanner entrada = new Scanner(System.in);
 
@@ -44,26 +47,33 @@ public class Principal {
             entrada.nextLine();
             System.out.println(opcion);
 
-            switch (opcion){
+            switch (opcion) {
                 case 1:
-                    buscarSerieWeb();
+                    monedaObjetivo="ARS";
                     break;
                 case 2:
-                    buscarEpisodiosPorSerie();
+                    monedaObjetivo="BRL";
                     break;
                 case 3:
-                    mostrarSeriesBuscadas();
+                    monedaObjetivo="COP";
                     break;
                 case 4:
-                    buscarSeriesPorTitulo();
+                    monedaObjetivo="MXN";
                     break;
                 case 0:
                     System.out.println("Cerrando aplicacion");
                     break;
                 default:
                     System.out.println("Opcion invalida o no puede ser procesada en este momento");
+            }
 
-            String direccionAPI = "https://v6.exchangerate-api.com/v6/823aa6303afbb5bf621cafd8/latest/USD";
+            System.out.println("Ingrese la cantidad a convertir");
+            double cantidadMoneda=1;
+            cantidadMoneda = entrada.nextDouble();
+            System.out.println("Iniciando operacion de conversion...");
+
+            String direccionAPI = "https://v6.exchangerate-api.com/v6/823aa6303afbb5bf621cafd8/pair/"+monedaBase+"/"+monedaObjetivo+"/"+cantidadMoneda;
+            //String direccionAPI = "https://v6.exchangerate-api.com/v6/823aa6303afbb5bf621cafd8/latest/USD";
 
             try {
                 //uso de la clase httpcliente
@@ -82,8 +92,9 @@ public class Principal {
                 //impresion del json completo recibido de la api
                 //System.out.println(json);
 
-                Monedas2 moneda = gson.fromJson(json, Monedas2.class);
-                System.out.println(moneda);
+                //Monedas2 moneda = gson.fromJson(json, Monedas2.class);
+                ResultadoConversion resultadoConversion = gson.fromJson(json, ResultadoConversion.class);
+                System.out.println("Su cantidad de: "+cantidadMoneda+" "+resultadoConversion.base_code()+" \ntiene un valor equivalente a: "+ resultadoConversion.conversion_result()+" "+resultadoConversion.target_code());
 
             } catch (IOException e) {
                 throw new RuntimeException(e);
